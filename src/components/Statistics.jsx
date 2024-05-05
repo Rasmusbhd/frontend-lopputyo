@@ -9,7 +9,7 @@ export default function StatisticsView() {
     useEffect(() => {
         getTrainings();
     }, []);
-
+    // Haetaan kaikki harjoitukset tietokannasta
     const getTrainings = () => {
         fetch('https://customerrestservice-personaltraining.rahtiapp.fi/api/trainings')
             .then(response => response.json())

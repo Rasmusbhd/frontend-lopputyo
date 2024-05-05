@@ -2,9 +2,9 @@ import React, { useEffect, useState, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-material.css';
-import { format } from 'date-fns';
+import { format} from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
 import { Button, Snackbar, AppBar, Toolbar, Typography } from '@mui/material';
-import AddTraining from './AddTraining';
 
 export default function TrainingList() {
     const [trainings, setTrainings] = useState([]);
@@ -15,27 +15,42 @@ export default function TrainingList() {
     useEffect(() => {
         getTrainings();
     }, []);
-
+    // Haetaan kaikki harjoitukset tietokannasta
     const getTrainings = () => {
         fetch('https://customerrestservice-personaltraining.rahtiapp.fi/api/trainings')
             .then(response => response.json())
-            .then(data => setTrainings(data._embedded.trainings.map(training => {
-                let customerName = 'Unknown';
+            .then(async data => {
+                const trainingsWithCustomerName = await Promise.all(
+                    data._embedded.trainings.map(async (training) => {
+                        let customerName = 'Unknown'; // Alustetaan asiakasnimi
+                        // Jos harjoitukselta löytyy asiakaslinkki, haetaan asiakasdata
+                        if (training._links && training._links.customer) {
+                            const customerResponse = await fetch(training._links.customer.href);
+                            const customerData = await customerResponse.json();
+
+                            customerName = `${customerData.firstname} ${customerData.lastname}`;
+                        }
+                        // Formatoidaan harjoituksen päivämäärä ja aika
+                        const formattedDate = format(
+                            toZonedTime(new Date(training.date), 'UTC'),
+                            'dd.MM.yyyy HH:mm',
+                            { timeZone: 'UTC' }
+                        );
+                        // Palautetaan harjoitusdata, asiakasnimi, formatoitu päivämäärä ja aika
+                        return {
+                            ...training,
+                            date: formattedDate,
+                            customerName
+                        };
+                    })
+                );
                 
-                if (training.customer) {
-                    customerName = `${training.customer.firstname} ${training.customer.lastname}`;
-                }
-                
-                return {
-                    ...training,
-                    date: format(new Date(training.date), 'dd.MM.yyyy HH:mm'),
-                    customerName
-                };
-            })))
+                setTrainings(trainingsWithCustomerName);
+            })
             .catch(err => console.error(err));
     };
 
-
+    // Poistetaan yksi harjoitus tietokannasta
     const deleteTraining = (params) => {
         const confirmed = window.confirm('Are you sure you want to delete this training?');
         if (confirmed) {
@@ -52,27 +67,7 @@ export default function TrainingList() {
                 .catch(error => console.error(error));
         }
     };
-
-    const saveTraining = (training) => {
-        fetch('https://customerrestservice-personaltraining.rahtiapp.fi/api/trainings', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(training)
-        })
-            .then(response => {
-                if (response.ok) {
-                    setMsg('The training was saved successfully!');
-                    setOpen(true);
-                    getTrainings();
-                } else {
-                    window.alert('Something went wrong with saving.');
-                }
-            })
-            .catch(err => console.error(err));
-    };
-
+    // Sarakeasettelut ja näytetään valitut tiedot taulukossa
     const columns = [
         { field: 'date', sortable: true, filter: true, headerName: 'Date' },
         { field: 'duration', sortable: true, filter: true, headerName: 'Duration' },

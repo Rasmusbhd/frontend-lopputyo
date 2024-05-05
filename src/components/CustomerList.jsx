@@ -15,14 +15,31 @@ export default function CustomerList() {
     useEffect(() => {
         getCustomers();
     }, []);
-
+    // Haetaan asiakastiedot 
     const getCustomers = () => {
         fetch('https://customerrestservice-personaltraining.rahtiapp.fi/api/customers')
             .then(response => response.json())
             .then(data => setCustomers(data._embedded.customers))
             .catch(err => console.error(err));
     };
-
+    // Poistetaan yksi asiakas tietokannasta
+    const deleteCustomer = (params) => {
+        const confirmed = window.confirm("Are you sure you want to delete this customer?");
+        if (confirmed) {
+            fetch(params.data._links.customer.href, { method: 'DELETE' })
+                .then(response => {
+                    if (response.ok) {
+                        setMsg("The customer was deleted successfully!");
+                        setOpen(true);
+                        getCustomers();
+                    } else {
+                        window.alert("Something went wrong with deleting.");
+                    }
+                })
+                .catch(error => console.error(error));
+        }
+    };
+    //Tallenetaan uusi asiakas tietokantaan
     const saveCustomer = (customer) => {
         fetch('https://customerrestservice-personaltraining.rahtiapp.fi/api/customers', {
             method: 'POST',
@@ -42,7 +59,27 @@ export default function CustomerList() {
             })
             .catch(err => console.error(err));
     };
-
+    // Päivitetään asiakkaan tietoja tietokantaan
+    const updateCustomer = (customer, link) => {
+        fetch(link, {
+            method: 'PUT',
+            headers: {
+                'Content-Type' : 'application/json'
+            },
+            body: JSON.stringify(customer)
+        })
+        .then(response => {
+            if (response.ok) {
+                setMsg("The customer was updated successfully!")
+                setOpen(true);
+                getCustomers();
+            } else {
+                window.alert("Something goes wrong with updating.")
+            }
+        })
+        .catch(err => console.error(err))
+    }
+    // Lisätään uusi harjoitus asiakkaalle
     const saveTraining = (training) => {
         fetch('https://customerrestservice-personaltraining.rahtiapp.fi/api/trainings', {
             method: 'POST',
@@ -62,7 +99,7 @@ export default function CustomerList() {
             })
             .catch(err => console.error(err));
     };
-
+    // Sarakeasettelut ja mitkä tiedot näytetään taulukossa
     const columns = [
         {
             cellRenderer: (params) => <AddTraining saveTraining={saveTraining} customer={params.data} />,

@@ -6,19 +6,22 @@ import Statistics from './components/Statistics';
 import { AppBar, Toolbar, Typography } from '@mui/material';
 import { Link, Outlet } from 'react-router-dom';
 import "./App.css";
+import { Routes, Route } from "react-router-dom";
+import Navbar from './components/Navbar';
+import './App.css';
 
 function App() {
   return (
-    <div className='App'>
-      <nav>
-        <Link to={"/"}>Home</Link>
-        <Link to={"/customerlist"}>Customers</Link>
-        <Link to={"/traininglist"}>Trainings</Link>
-        <Link to={"/calendar"}>Calendar</Link>
-        <Link to={"/statistics"}>Statistics</Link>
-      </nav>
-      <Outlet />
-    </div>
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/customerlist" element={<CustomerList />} />
+        <Route path="/traininglist" element={<TrainingList />} />
+        <Route path="/calendar" element={<Calendar />} />
+        <Route path="/statistics" element={<Statistics />} />
+      </Routes>
+    </>
   );
 }
 

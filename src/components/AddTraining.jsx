@@ -7,7 +7,7 @@ export default function AddTraining(props) {
         date: '',
         duration: '',
         activity: '',
-        customer: props.customer._links.self.href, // Assuming the customer object is passed as a prop
+        customer: props.customer._links.self.href
     });
 
     const handleClickOpen = () => {
