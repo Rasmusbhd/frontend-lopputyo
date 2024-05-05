@@ -1,14 +1,11 @@
-import CustomerList from './components/CustomerList';
+import CustomerList from './components/CustomerList' // Valittaa polun nimestä, koska olin muuttanut tiedoston nimeä jälkikäteen
 import TrainingList from './components/TrainingList';
 import Home from './components/Home';
 import Calendar from './components/Calendar'
 import Statistics from './components/Statistics';
-import { AppBar, Toolbar, Typography } from '@mui/material';
-import { Link, Outlet } from 'react-router-dom';
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import Navbar from './components/Navbar';
-import './App.css';
 
 function App() {
   return (
