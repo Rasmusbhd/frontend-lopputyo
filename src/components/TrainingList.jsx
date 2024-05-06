@@ -23,20 +23,26 @@ export default function TrainingList() {
                 const trainingsWithCustomerName = await Promise.all(
                     data._embedded.trainings.map(async (training) => {
                         let customerName = 'Unknown'; // Alustetaan asiakasnimi
-                        // Jos harjoitukselta löytyy asiakaslinkki, haetaan asiakasdata
                         if (training._links && training._links.customer) {
-                            const customerResponse = await fetch(training._links.customer.href);
-                            const customerData = await customerResponse.json();
-
-                            customerName = `${customerData.firstname} ${customerData.lastname}`;
+                            try {
+                                const customerResponse = await fetch(training._links.customer.href);
+                                if (customerResponse.ok) {
+                                    const customerData = await customerResponse.json();
+                                    customerName = `${customerData.firstname} ${customerData.lastname}`;
+                                } else {
+                                    console.error(`Failed to fetch customer data: ${customerResponse.status}`);
+                                }
+                            } catch (error) {
+                                console.error(`Error fetching customer data: ${error}`);
+                            }
                         }
-                        // Formatoidaan harjoituksen päivämäärä ja aika
+    
                         const formattedDate = format(
                             toZonedTime(new Date(training.date), 'UTC'),
                             'dd.MM.yyyy HH:mm',
                             { timeZone: 'UTC' }
                         );
-                        // Palautetaan harjoitusdata, asiakasnimi, formatoitu päivämäärä ja aika
+    
                         return {
                             ...training,
                             date: formattedDate,
@@ -44,7 +50,7 @@ export default function TrainingList() {
                         };
                     })
                 );
-                
+    
                 setTrainings(trainingsWithCustomerName);
             })
             .catch(err => console.error(err));
