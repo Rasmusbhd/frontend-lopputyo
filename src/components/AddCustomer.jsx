@@ -22,9 +22,14 @@ export default function AddCustomer(props) {
         setCustomer({...customer, [event.target.name] : event.target.value})
     }
     const addCustomer = () => {
+        const { firstname, lastname, streetaddress, postcode, city, email, phone } = customer;
+        if (!firstname || !lastname || !streetaddress || !postcode || !city || !email || !phone) {
+            window.alert('Please fill in all required fields.');
+            return;
+        }
         props.saveCustomer(customer);
         handleClose();
-    }
+    };
     return (
         <div>
         <Button variant="outlined" color="primary" onClick={handleClickOpen}>Add Customer</Button>

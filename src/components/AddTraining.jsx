@@ -24,6 +24,16 @@ export default function AddTraining(props) {
     };
 
     const addTraining = () => {
+        const { date, duration, activity } = training;
+    
+        // Tarkista, että kaikki kentät on täytetty
+        if (!date || !duration || !activity) {
+            // Käytä window.alert-funktiota varoittaaksesi käyttäjää
+            window.alert('Please fill in all required fields.');
+            return; // Lopeta funktio, jotta tallennusta ei suoriteta
+        }
+    
+        // Kaikki kentät ovat täynnä, tallennetaan koulutus
         props.saveTraining(training);
         handleClose();
     };

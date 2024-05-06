@@ -33,6 +33,11 @@ export default function EditCustomer(props) {
     };
 
     const updateCustomer = () => {
+        const { firstname, lastname, streetaddress, postcode, city, email, phone } = customer;
+        if (!firstname || !lastname || !streetaddress || !postcode || !city || !email || !phone) {
+            window.alert('Please fill in all required fields.');
+            return;
+        }
         props.updateCustomer(customer, props.customer._links.customer.href);
         setOpen(false);
     };
