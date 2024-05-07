@@ -6,6 +6,7 @@ import Statistics from './components/Statistics';
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import Navbar from './components/Navbar';
+import Error from './components/Error';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/traininglist" element={<TrainingList />} />
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/statistics" element={<Statistics />} />
+        <Route path="*" element={<Error />} />
       </Routes>
     </>
   );

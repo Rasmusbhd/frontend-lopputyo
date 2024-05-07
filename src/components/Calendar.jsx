@@ -24,8 +24,6 @@ export default function CalendarView() {
                     // Muunnetaan harjoitukset näyttämään saman ajan, kuin miten se on tietokannassa
                     const utcStart = toZonedTime(new Date(training.date), 'UTC');
                     const utcEnd = new Date(utcStart.getTime() + training.duration * 60 * 1000);
-
-                    // Format `start` and `end` as UTC times
                     return {
                         title: `${training.activity} / ${training.customer?.firstname} ${training.customer?.lastname}`,
                         start: utcStart,
